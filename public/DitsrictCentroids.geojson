@@ -1,0 +1,24 @@
+{
+"type": "FeatureCollection",
+"name": "DitsrictCentroids",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "NAME_1": "Gujarat", "ID_2": 116, "NAME_2": "Anand", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 72.79101577649061, 22.450248684858579 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Gujarat", "ID_2": 118, "NAME_2": "Bharuch", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 72.922879590510888, 21.787307735378818 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Gujarat", "ID_2": 120, "NAME_2": "Dahod", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 74.019886174544112, 22.910136131244972 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Gujarat", "ID_2": 125, "NAME_2": "Kheda", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 73.023469378809651, 22.876415965983288 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Gujarat", "ID_2": 129, "NAME_2": "Panch Mahals", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 73.608534754117642, 22.852929988304293 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Gujarat", "ID_2": 133, "NAME_2": "Sabar Kantha", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 73.166584390408175, 23.658212033598517 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Gujarat", "ID_2": 137, "NAME_2": "Vadodara", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 73.541206413386504, 22.226402412182669 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Madhya Pradesh", "ID_2": 261, "NAME_2": "Dhar", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 75.105238842270651, 22.500172750723074 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Madhya Pradesh", "ID_2": 270, "NAME_2": "Jhabua", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 74.523327103991264, 22.609298893852085 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Madhya Pradesh", "ID_2": 276, "NAME_2": "Neemuch", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 75.143155644297053, 24.609214627947345 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Madhya Pradesh", "ID_2": 280, "NAME_2": "Ratlam", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 75.090134434295095, 23.504176803527752 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Madhya Pradesh", "ID_2": 292, "NAME_2": "Ujjain", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 75.667346808973917, 23.335192616742845 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Rajasthan", "ID_2": 415, "NAME_2": "Banswara", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 74.395841864706014, 23.509113306655827 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Rajasthan", "ID_2": 422, "NAME_2": "Chittaurgarh", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 74.543695163548392, 24.626855261361886 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Rajasthan", "ID_2": 426, "NAME_2": "Dungarpur", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 73.857934958428316, 23.734164323228374 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Rajasthan", "ID_2": 444, "NAME_2": "Udaipur", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 73.755883996436339, 24.391910320543815 ] } },
+{ "type": "Feature", "properties": { "NAME_1": "Rajasthan", "ID_2": 422, "NAME_2": "Chittaurgarh", "TYPE_2": "District", "ENGTYPE_2": "District" }, "geometry": { "type": "Point", "coordinates": [ 75.55981194001285, 24.846676667749708 ] } }
+]
+}
