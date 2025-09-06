@@ -706,7 +706,7 @@ export default function MapComponent() {
       <MapContainer
         center={center}
         zoom={8}
-        style={{ height: "100%", width: "100%", zIndex: 10000 }}
+        style={{ height: "100%", width: "100%", zIndex: 1 }}
         zoomControl={false}
       >
         <MapEventsHandler />
