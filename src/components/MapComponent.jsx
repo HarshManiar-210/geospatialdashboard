@@ -598,11 +598,11 @@ export default function MapComponent() {
   // Style function for GeoJSON layers
   const getLayerStyle = (layerId) => {
     const styles = {
-      district: { color: "#ff6b6b", weight: 2, fillOpacity: 0.1 },
-      talukas: { color: "#4ecdc4", weight: 1, fillOpacity: 0.1 },
-      road: { color: "#45b7d1", weight: 2, fillOpacity: 0 },
-      railways: { color: "#f9ca24", weight: 3, fillOpacity: 0 },
-      canal: { color: "#6c5ce7", weight: 2, fillOpacity: 0 },
+      district: { color: "#000000", weight: 2, fillOpacity: 0.1 }, // Black for District Boundary
+      talukas: { color: "#1f78b4", weight: 1, fillOpacity: 0.1 }, // Blue for Taluka Boundary
+      road: { color: "#878787", weight: 2, fillOpacity: 0 }, // Gray for Road
+      railways: { color: "#e31a1c", weight: 3, fillOpacity: 0 }, // Red for Railway
+      canal: { color: "#2741ea", weight: 2, fillOpacity: 0 }, // Blue for Canal
     };
     return styles[layerId] || { color: "#000", weight: 1, fillOpacity: 0.1 };
   };
@@ -754,7 +754,7 @@ export default function MapComponent() {
                 key={basin.id}
                 data={waterBasinData[basin.id]}
                 style={() => ({
-                  color: "#8B6B55",
+                  color: "#7ac602", // Green for Vegetation Patches (MA-basins)
                   weight: 2,
                   fillOpacity: 0.2,
                 })}
@@ -811,7 +811,7 @@ export default function MapComponent() {
                       data={filteredData}
                       style={() => ({
                         ...getRiverStyle(orderId),
-                        color: "blue", // Blue color for rivers
+                        color: "#013ddc", // Blue color for rivers (Waterbodies color)
                         weight: getRiverStyle(orderId).weight, // Use order-based thickness
                         opacity: 0.8,
                       })}

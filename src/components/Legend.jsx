@@ -51,44 +51,110 @@ export default function Legend() {
         {!isCollapsed && (
           <div className="px-2 sm:px-3 pb-2 sm:pb-3 border-t border-gray-200">
             <div className="space-y-1 sm:space-y-2 mt-1 sm:mt-2">
-              {/* Layer Legend Items */}
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-sm"></div>
-                <span className="text-xs sm:text-sm text-gray-700">District</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 sm:w-4 sm:h-4 bg-teal-500 rounded-sm"></div>
-                <span className="text-xs sm:text-sm text-gray-700">Talukas</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-1 sm:w-4 sm:h-1 bg-blue-500"></div>
-                <span className="text-xs sm:text-sm text-gray-700">Road</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-1 sm:w-4 sm:h-1 bg-yellow-500"></div>
-                <span className="text-xs sm:text-sm text-gray-700">Railways</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-1 sm:w-4 sm:h-1 bg-purple-500"></div>
-                <span className="text-xs sm:text-sm text-gray-700">Canal</span>
+              {/* Boundaries Section */}
+              <div>
+                <h3 className="text-xs font-semibold mb-1 text-gray-700">BOUNDARIES</h3>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-black border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">District Boundary</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#1f78b4] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Taluka Boundary</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Theme Legend Items */}
-              <div className="border-t border-gray-200 pt-1 sm:pt-2 mt-1 sm:mt-2">
-                <div className="text-xs text-gray-500 font-medium mb-1">
-                  Themes
+              {/* Infrastructure Section */}
+              <div>
+                <h3 className="text-xs font-semibold mb-1 text-gray-700">INFRASTRUCTURE</h3>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-1 sm:w-4 sm:h-1 bg-[#878787] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Road</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-1 sm:w-4 sm:h-1 bg-[#e31a1c] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Railway</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-1 sm:w-4 sm:h-1 bg-[#2741ea] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Canal</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-sm"></div>
-                  <span className="text-xs sm:text-sm text-gray-700">Landuse</span>
+              </div>
+
+              {/* MA-Basins Section */}
+              <div>
+                <h3 className="text-xs font-semibold mb-1 text-gray-700">MA-BASINS</h3>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#7ac602] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Water Shade Basins</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 bg-blue-400 rounded-sm"></div>
-                  <span className="text-xs sm:text-sm text-gray-700">Hydrology</span>
+              </div>
+
+              {/* Landuse Section */}
+              <div>
+                <h3 className="text-xs font-semibold mb-1 text-gray-700">LANDUSE</h3>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#ff0000] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Builtup</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#013ddc] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Waterbodies</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#feff73] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Agriculture</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#7ac602] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Vegetation Patches</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#95e689] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Shrubland</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#dfaaf0] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Salineland</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#fe95e7] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Barrenland</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#fefeb4] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Fallowland</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-[#267300] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Forest Patches</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 bg-orange-500 rounded-sm"></div>
-                  <span className="text-xs sm:text-sm text-gray-700">Terrain</span>
+              </div>
+
+              {/* Terrain Section */}
+              <div>
+                <h3 className="text-xs font-semibold mb-1 text-gray-700">TERRAIN</h3>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-b from-[#ff0000] via-[#ff8f00] via-[#ffff00] to-[#4defef] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Elevation</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-b from-[#00aaff] via-[#95ffd9] via-[#fcff80] via-[#ffcf5f] to-[#ff1a00] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Slope</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-b from-[#030077] via-[#0064ff] via-[#00c2ff] via-[#00ffbb] via-[#fffa00] via-[#ffb300] via-[#ff0200] to-[#930000] border border-gray-300 rounded flex-shrink-0"></div>
+                    <span className="text-xs sm:text-sm text-gray-700">Aspect</span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -28,23 +28,22 @@
   transition: all 0.2s ease;
 }
 
-/* Taluka centroids - blue color */
+/* Taluka centroids - blue color matching legend */
 .centroid-label.taluka {
-  color: #ffffff;
-
+  color: #1f78b4;
   font-size: 10px;
   font-weight: 700;
 }
 
 .centroid-label.taluka:hover {
-  background: rgba(45, 189, 193, 1);
+  background: rgba(31, 120, 180, 0.2);
   transform: scale(1.1);
   transition: all 0.2s ease;
 }
 
-/* Water basin centroids - red color */
+/* Water basin centroids - green color matching MA-basins */
 .centroid-label.water-basin {
-  color: rgba(220, 38, 38, 1);
+  color: #7ac602;
   font-size: 10px;
   font-weight: 700;
 }
