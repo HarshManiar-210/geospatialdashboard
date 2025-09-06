@@ -1,12 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { TreePine, Layers, Waves, MapPin } from "lucide-react";
 import { toggleMapPopup, closeMapPopup } from "../store/mapSlice";
+import { toggleLayersPopup, closeLayersPopup } from "../store/layersSlice";
 
 export default function Sidebar() {
   const dispatch = useDispatch();
-  const active = useSelector((state) =>
-    state.map.showMapPopup ? "Map" : null
-  );
+  const active = useSelector((state) => {
+    if (state.map.showMapPopup) return "Map";
+    if (state.layers.showLayersPopup) return "Layers";
+    return null;
+  });
 
   const buttons = [
     { id: "Theme", label: "Theme", icon: <TreePine size={24} /> },
@@ -18,8 +21,13 @@ export default function Sidebar() {
   const handleClick = (id) => {
     if (id === "Map") {
       dispatch(toggleMapPopup());
+      dispatch(closeLayersPopup());
+    } else if (id === "Layers") {
+      dispatch(toggleLayersPopup());
+      dispatch(closeMapPopup());
     } else {
       dispatch(closeMapPopup());
+      dispatch(closeLayersPopup());
     }
   };
 
