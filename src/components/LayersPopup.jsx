@@ -22,7 +22,7 @@ export default function LayersPopup({ layers, onClose, onToggleLayer }) {
               type="checkbox"
               checked={layer.visible}
               onChange={() => onToggleLayer(layer.id)}
-              className="w-4 h-4 text-[#8B6B55] bg-gray-100 border-gray-300 rounded focus:ring-[#8B6B55] focus:ring-2"
+              className="w-4 h-4 text-[#8B6B55] bg-gray-100 border-gray-300 rounded"
             />
             <span className="text-sm text-gray-700">{layer.label}</span>
           </label>

@@ -41,3 +41,33 @@
   transform: scale(1.1);
   transition: all 0.2s ease;
 }
+
+/* Water basin centroids - red color */
+.centroid-label.water-basin {
+  color: rgba(220, 38, 38, 1);
+  font-size: 10px;
+  font-weight: 700;
+}
+/* Custom scrollbar styling */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #8b6b55 #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #8b6b55;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a17e65;
+}

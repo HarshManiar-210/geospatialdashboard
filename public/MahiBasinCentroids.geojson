@@ -1,17 +1,150 @@
 {
-"type": "FeatureCollection",
-"name": "MahiBasinCentroids",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32643" } },
-"features": [
-{ "type": "Feature", "properties": { "Basin Name": "MA-1", "number": 1, "area": 8563965945.0150995, "perimeter": 574683.1882, "layer": "MA1" }, "geometry": { "type": "Point", "coordinates": [ 401889.38805625383975, 2674756.864767228718847 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-10", "number": 10, "area": 6066748063.9453001, "perimeter": 484754.1228, "layer": "MA10" }, "geometry": { "type": "Point", "coordinates": [ 298155.550035346415825, 2444680.003364785108715 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-2", "number": 2, "area": 1073970741.9108, "perimeter": 220621.8224, "layer": "MA2" }, "geometry": { "type": "Point", "coordinates": [ 447316.506375195865985, 2639378.704332221765071 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-3", "number": 3, "area": 1483828590.5734, "perimeter": 233216.0288, "layer": "MA3" }, "geometry": { "type": "Point", "coordinates": [ 472229.286235274921637, 2620840.681640848051757 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-4", "number": 4, "area": 3222534389.9390998, "perimeter": 361344.3536, "layer": "MA4" }, "geometry": { "type": "Point", "coordinates": [ 411439.585226029099431, 2616565.145407652948052 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-5", "number": 5, "area": 4740907530.3290997, "perimeter": 411132.8792, "layer": "MA5" }, "geometry": { "type": "Point", "coordinates": [ 489147.541812138224486, 2553767.910859329625964 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-6", "number": 6, "area": 2457114026.4513001, "perimeter": 318012.1687, "layer": "MA6" }, "geometry": { "type": "Point", "coordinates": [ 379108.026186953473371, 2574912.802136627957225 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-7", "number": 7, "area": 5681489870.4089003, "perimeter": 436719.7621, "layer": "MA7" }, "geometry": { "type": "Point", "coordinates": [ 440677.760906095732935, 2539173.600417809560895 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-8", "number": 8, "area": 2723830074.7993999, "perimeter": 303034.5573, "layer": "MA8" }, "geometry": { "type": "Point", "coordinates": [ 388170.121003892389126, 2526506.542435103096068 ] } },
-{ "type": "Feature", "properties": { "Basin Name": "MA-9", "number": 9, "area": 4028371881.2372999, "perimeter": 413936.2768, "layer": "MA9" }, "geometry": { "type": "Point", "coordinates": [ 336637.149540246289689, 2511429.789629391860217 ] } }
-]
+  "type": "FeatureCollection",
+  "name": "MahiBasinCentroids",
+  "crs": {
+    "type": "name",
+    "properties": { "name": "urn:ogc:def:crs:EPSG::32643" }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-1",
+        "number": 1,
+        "area": 8563965945.0150995,
+        "perimeter": 574683.1882,
+        "layer": "MA1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [401889.38805625383975, 2674756.864767228718847]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-10",
+        "number": 10,
+        "area": 6066748063.9453001,
+        "perimeter": 484754.1228,
+        "layer": "MA10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [298155.550035346415825, 2444680.003364785108715]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-2",
+        "number": 2,
+        "area": 1073970741.9108,
+        "perimeter": 220621.8224,
+        "layer": "MA2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [447316.506375195865985, 2639378.704332221765071]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-3",
+        "number": 3,
+        "area": 1483828590.5734,
+        "perimeter": 233216.0288,
+        "layer": "MA3"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [472229.286235274921637, 2620840.681640848051757]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-4",
+        "number": 4,
+        "area": 3222534389.9390998,
+        "perimeter": 361344.3536,
+        "layer": "MA4"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [411439.585226029099431, 2616565.145407652948052]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-5",
+        "number": 5,
+        "area": 4740907530.3290997,
+        "perimeter": 411132.8792,
+        "layer": "MA5"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [489147.541812138224486, 2553767.910859329625964]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-6",
+        "number": 6,
+        "area": 2457114026.4513001,
+        "perimeter": 318012.1687,
+        "layer": "MA6"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [379108.026186953473371, 2574912.802136627957225]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-7",
+        "number": 7,
+        "area": 5681489870.4089003,
+        "perimeter": 436719.7621,
+        "layer": "MA7"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [440677.760906095732935, 2539173.600417809560895]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-8",
+        "number": 8,
+        "area": 2723830074.7993999,
+        "perimeter": 303034.5573,
+        "layer": "MA8"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [388170.121003892389126, 2526506.542435103096068]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Basin Name": "MA-9",
+        "number": 9,
+        "area": 4028371881.2372999,
+        "perimeter": 413936.2768,
+        "layer": "MA9"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [336637.149540246289689, 2511429.789629391860217]
+      }
+    }
+  ]
 }

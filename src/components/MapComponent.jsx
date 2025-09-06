@@ -16,6 +16,7 @@ import LayersPopup from "./LayersPopup";
 import ThemePopup from "./ThemePopup";
 import CoordinateDisplay from "./CoordinateDisplay";
 import Legend from "./Legend";
+import WaterShadeBasinPopup from "./WaterShadeBasinPopup";
 import { closeMapPopup, setActiveLayer } from "../store/mapSlice";
 import { closeLayersPopup, toggleLayerVisibility } from "../store/layersSlice";
 import {
@@ -23,7 +24,12 @@ import {
   setSelectedTheme,
   setSelectedSubTheme,
 } from "../store/themeSlice";
+import {
+  closeWaterShadeBasinPopup,
+  toggleBasinVisibility,
+} from "../store/waterShadeBasinSlice";
 import { useEffect, useState } from "react";
+import proj4 from "proj4";
 
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -35,6 +41,66 @@ const defaultIcon = L.icon({
   iconAnchor: [12, 41],
 });
 L.Marker.prototype.options.icon = defaultIcon;
+
+// Define UTM Zone 43N projection (EPSG:32643)
+proj4.defs("EPSG:32643", "+proj=utm +zone=43 +datum=WGS84 +units=m +no_defs");
+proj4.defs("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
+
+// Function to transform UTM coordinates to WGS84
+const transformUTMToWGS84 = (geoJson) => {
+  if (!geoJson || !geoJson.features) return geoJson;
+
+  const transformedFeatures = geoJson.features.map((feature) => {
+    if (feature.geometry && feature.geometry.type === "MultiPolygon") {
+      const transformedCoordinates = feature.geometry.coordinates.map(
+        (polygon) =>
+          polygon.map((ring) =>
+            ring.map((coord) => {
+              const [x, y] = coord;
+              try {
+                const [lng, lat] = proj4("EPSG:32643", "EPSG:4326", [x, y]);
+                return [lng, lat];
+              } catch (error) {
+                console.error("Coordinate transformation error:", error, {
+                  x,
+                  y,
+                });
+                return [x, y]; // Return original if transformation fails
+              }
+            })
+          )
+      );
+      return {
+        ...feature,
+        geometry: {
+          ...feature.geometry,
+          coordinates: transformedCoordinates,
+        },
+      };
+    } else if (feature.geometry && feature.geometry.type === "Point") {
+      const [x, y] = feature.geometry.coordinates;
+      try {
+        const [lng, lat] = proj4("EPSG:32643", "EPSG:4326", [x, y]);
+        return {
+          ...feature,
+          geometry: {
+            ...feature.geometry,
+            coordinates: [lng, lat],
+          },
+        };
+      } catch (error) {
+        console.error("Point transformation error:", error, { x, y });
+        return feature; // Return original if transformation fails
+      }
+    }
+    return feature;
+  });
+
+  return {
+    ...geoJson,
+    features: transformedFeatures,
+  };
+};
 
 // Component to handle map events
 function MapEvents({ onMouseMove, onMouseLeave }) {
@@ -67,8 +133,12 @@ export default function MapComponent() {
   const { showLayersPopup, layers } = useSelector((state) => state.layers);
   const { showThemePopup, themes, selectedTheme, selectedSubTheme } =
     useSelector((state) => state.theme);
+  const { showWaterShadeBasinPopup, basins, selectedBasins, centroidsFile } =
+    useSelector((state) => state.waterShadeBasin);
   const [geoJsonData, setGeoJsonData] = useState({});
   const [centroidsData, setCentroidsData] = useState({});
+  const [waterBasinData, setWaterBasinData] = useState({});
+  const [waterBasinCentroidsData, setWaterBasinCentroidsData] = useState(null);
   const [mouseCoordinates, setMouseCoordinates] = useState(null);
 
   const handleLayerChange = (layerId) => {
@@ -99,10 +169,19 @@ export default function MapComponent() {
     dispatch(setSelectedSubTheme(subThemeId));
   };
 
+  const handleCloseWaterShadeBasinPopup = () => {
+    dispatch(closeWaterShadeBasinPopup());
+  };
+
+  const handleToggleBasin = (basinId) => {
+    dispatch(toggleBasinVisibility(basinId));
+  };
+
   // Image overlay bounds and current image
+  const imageOffset = 0.002; // Offset to shift image to the right
   const imageBounds = [
-    [21.6538526169347278, 72.4500108944436363], // Southwest corner
-    [24.599028110435821, 75.2870019434714663], // Northeast corner
+    [21.6538526169347278, 72.4500108944436363 + imageOffset], // Southwest corner
+    [24.599028110435821, 75.2870019434714663 + imageOffset], // Northeast corner
   ];
 
   const getCurrentImageUrl = () => {
@@ -147,6 +226,41 @@ export default function MapComponent() {
     };
     loadGeoJsonData();
   }, [layers]);
+
+  // Load Water Shade Basin data
+  useEffect(() => {
+    const loadWaterBasinData = async () => {
+      const data = {};
+
+      for (const basin of basins) {
+        try {
+          const response = await fetch(`/${basin.file}`);
+          const geoJson = await response.json();
+          // Transform UTM coordinates to WGS84
+          const transformedGeoJson = transformUTMToWGS84(geoJson);
+          data[basin.id] = transformedGeoJson;
+        } catch (error) {
+          console.error(`Error loading ${basin.file}:`, error);
+        }
+      }
+
+      // Load centroids
+      try {
+        const centroidsResponse = await fetch(`/${centroidsFile}`);
+        const centroidsJson = await centroidsResponse.json();
+        console.log("Original centroids data:", centroidsJson);
+        // Transform centroids coordinates as well
+        const transformedCentroids = transformUTMToWGS84(centroidsJson);
+        console.log("Transformed centroids data:", transformedCentroids);
+        setWaterBasinCentroidsData(transformedCentroids);
+      } catch (error) {
+        console.error(`Error loading ${centroidsFile}:`, error);
+      }
+
+      setWaterBasinData(data);
+    };
+    loadWaterBasinData();
+  }, [basins, centroidsFile]);
 
   // Style function for GeoJSON layers
   const getLayerStyle = (layerId) => {
@@ -202,8 +316,44 @@ export default function MapComponent() {
     });
   };
 
+  // Function to render water basin centroids
+  const renderWaterBasinCentroids = (centroidsGeoJson, selectedBasins) => {
+    if (!centroidsGeoJson || !centroidsGeoJson.features) return null;
+
+    return centroidsGeoJson.features.map((feature, index) => {
+      if (feature.geometry && feature.geometry.type === "Point") {
+        const coordinates = feature.geometry.coordinates;
+        const basinName = feature.properties["Basin Name"] || "Unknown";
+        const layerId = feature.properties.layer;
+
+        // Check if this centroid belongs to a selected basin
+        const isSelected = selectedBasins.includes(layerId);
+
+        console.log(
+          `Centroid ${basinName} (${layerId}): selected=${isSelected}, coordinates=[${coordinates[1]}, ${coordinates[0]}]`
+        );
+
+        if (!isSelected) return null;
+
+        return (
+          <Marker
+            key={`water-basin-centroid-${index}`}
+            position={[coordinates[1], coordinates[0]]} // [lat, lng] for Leaflet
+            icon={L.divIcon({
+              className: "centroid-marker",
+              html: `<div class="centroid-label water-basin">${basinName}</div>`,
+              iconSize: [80, 16],
+              iconAnchor: [40, 8],
+            })}
+          />
+        );
+      }
+      return null;
+    });
+  };
+
   return (
-    <div className="relative h-screen w-full border rounded-xl">
+    <div className="relative h-screen w-full border rounded-xl overflow-hidden">
       <MapContainer
         center={center}
         zoom={8}
@@ -250,6 +400,32 @@ export default function MapComponent() {
           return null;
         })}
 
+        {/* Render Water Shade Basin layers */}
+        {basins.map((basin) => {
+          if (basin.visible && waterBasinData[basin.id]) {
+            return (
+              <GeoJSON
+                key={basin.id}
+                data={waterBasinData[basin.id]}
+                style={() => ({
+                  color: "#8B6B55",
+                  weight: 2,
+                  fillOpacity: 0.2,
+                })}
+              />
+            );
+          }
+          return null;
+        })}
+
+        {/* Render Water Basin Centroids */}
+        {waterBasinCentroidsData && (
+          <>
+            {console.log("Selected basins for centroids:", selectedBasins)}
+            {renderWaterBasinCentroids(waterBasinCentroidsData, selectedBasins)}
+          </>
+        )}
+
         <ZoomControl />
       </MapContainer>
 
@@ -293,6 +469,14 @@ export default function MapComponent() {
           onClose={handleCloseThemePopup}
           onThemeChange={handleThemeChange}
           onSubThemeChange={handleSubThemeChange}
+        />
+      )}
+
+      {showWaterShadeBasinPopup && (
+        <WaterShadeBasinPopup
+          basins={basins}
+          onClose={handleCloseWaterShadeBasinPopup}
+          onToggleBasin={handleToggleBasin}
         />
       )}
     </div>

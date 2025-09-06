@@ -3,6 +3,10 @@ import { TreePine, Layers, Waves, MapPin } from "lucide-react";
 import { toggleMapPopup, closeMapPopup } from "../store/mapSlice";
 import { toggleLayersPopup, closeLayersPopup } from "../store/layersSlice";
 import { toggleThemePopup, closeThemePopup } from "../store/themeSlice";
+import {
+  toggleWaterShadeBasinPopup,
+  closeWaterShadeBasinPopup,
+} from "../store/waterShadeBasinSlice";
 
 export default function Sidebar() {
   const dispatch = useDispatch();
@@ -10,6 +14,7 @@ export default function Sidebar() {
     if (state.map.showMapPopup) return "Map";
     if (state.layers.showLayersPopup) return "Layers";
     if (state.theme.showThemePopup) return "Theme";
+    if (state.waterShadeBasin.showWaterShadeBasinPopup) return "Water";
     return null;
   });
 
@@ -25,18 +30,27 @@ export default function Sidebar() {
       dispatch(toggleMapPopup());
       dispatch(closeLayersPopup());
       dispatch(closeThemePopup());
+      dispatch(closeWaterShadeBasinPopup());
     } else if (id === "Layers") {
       dispatch(toggleLayersPopup());
       dispatch(closeMapPopup());
       dispatch(closeThemePopup());
+      dispatch(closeWaterShadeBasinPopup());
     } else if (id === "Theme") {
       dispatch(toggleThemePopup());
       dispatch(closeMapPopup());
       dispatch(closeLayersPopup());
+      dispatch(closeWaterShadeBasinPopup());
+    } else if (id === "Water") {
+      dispatch(toggleWaterShadeBasinPopup());
+      dispatch(closeMapPopup());
+      dispatch(closeLayersPopup());
+      dispatch(closeThemePopup());
     } else {
       dispatch(closeMapPopup());
       dispatch(closeLayersPopup());
       dispatch(closeThemePopup());
+      dispatch(closeWaterShadeBasinPopup());
     }
   };
 
