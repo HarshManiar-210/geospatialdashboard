@@ -5,6 +5,7 @@ import {
   Popup,
   GeoJSON,
   ImageOverlay,
+  useMapEvents,
 } from "react-leaflet";
 import { useSelector, useDispatch } from "react-redux";
 import L from "leaflet";
@@ -13,6 +14,8 @@ import ZoomControl from "./ZoomControl";
 import MapLayerPopup from "./MapLayerPopup";
 import LayersPopup from "./LayersPopup";
 import ThemePopup from "./ThemePopup";
+import CoordinateDisplay from "./CoordinateDisplay";
+import Legend from "./Legend";
 import { closeMapPopup, setActiveLayer } from "../store/mapSlice";
 import { closeLayersPopup, toggleLayerVisibility } from "../store/layersSlice";
 import {
@@ -33,6 +36,21 @@ const defaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = defaultIcon;
 
+// Component to handle map events
+function MapEvents({ onMouseMove, onMouseLeave }) {
+  useMapEvents({
+    mousemove: (e) => {
+      const { lat, lng } = e.latlng;
+
+      onMouseMove({ lat, lng });
+    },
+    mouseout: () => {
+      onMouseLeave();
+    },
+  });
+  return null;
+}
+
 const tileUrls = {
   osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   satellite:
@@ -51,6 +69,7 @@ export default function MapComponent() {
     useSelector((state) => state.theme);
   const [geoJsonData, setGeoJsonData] = useState({});
   const [centroidsData, setCentroidsData] = useState({});
+  const [mouseCoordinates, setMouseCoordinates] = useState(null);
 
   const handleLayerChange = (layerId) => {
     dispatch(setActiveLayer(layerId));
@@ -184,13 +203,17 @@ export default function MapComponent() {
   };
 
   return (
-    <div className="relative h-screen w-full border rounded-xl overflow-hidden">
+    <div className="relative h-screen w-full border rounded-xl">
       <MapContainer
         center={center}
         zoom={8}
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: "100%", width: "100%", overflow: "hidden" }}
         zoomControl={false}
       >
+        <MapEvents
+          onMouseMove={setMouseCoordinates}
+          onMouseLeave={() => setMouseCoordinates(null)}
+        />
         <TileLayer
           url={tileUrls[activeLayer]}
           attribution="&copy; OpenStreetMap contributors"
@@ -229,6 +252,22 @@ export default function MapComponent() {
 
         <ZoomControl />
       </MapContainer>
+
+      {/* Coordinate Display - Outside MapContainer */}
+      <CoordinateDisplay coordinates={mouseCoordinates} />
+
+      {/* Legend and Statistics - Bottom Right */}
+      <Legend />
+
+      {/* Debug display */}
+      {/* <div className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded z-[9999] text-xs">
+        Debug:{" "}
+        {mouseCoordinates
+          ? `${mouseCoordinates.lat.toFixed(4)}, ${mouseCoordinates.lng.toFixed(
+              4
+            )}`
+          : "No coordinates"}
+      </div> */}
 
       {showMapPopup && (
         <MapLayerPopup
