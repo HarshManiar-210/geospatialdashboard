@@ -1,12 +1,25 @@
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  GeoJSON,
+  ImageOverlay,
+} from "react-leaflet";
 import { useSelector, useDispatch } from "react-redux";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import ZoomControl from "./ZoomControl";
 import MapLayerPopup from "./MapLayerPopup";
 import LayersPopup from "./LayersPopup";
+import ThemePopup from "./ThemePopup";
 import { closeMapPopup, setActiveLayer } from "../store/mapSlice";
 import { closeLayersPopup, toggleLayerVisibility } from "../store/layersSlice";
+import {
+  closeThemePopup,
+  setSelectedTheme,
+  setSelectedSubTheme,
+} from "../store/themeSlice";
 import { useEffect, useState } from "react";
 
 import iconUrl from "leaflet/dist/images/marker-icon.png";
@@ -34,6 +47,8 @@ export default function MapComponent() {
   const dispatch = useDispatch();
   const { showMapPopup, activeLayer } = useSelector((state) => state.map);
   const { showLayersPopup, layers } = useSelector((state) => state.layers);
+  const { showThemePopup, themes, selectedTheme, selectedSubTheme } =
+    useSelector((state) => state.theme);
   const [geoJsonData, setGeoJsonData] = useState({});
   const [centroidsData, setCentroidsData] = useState({});
 
@@ -51,6 +66,37 @@ export default function MapComponent() {
 
   const handleToggleLayer = (layerId) => {
     dispatch(toggleLayerVisibility(layerId));
+  };
+
+  const handleCloseThemePopup = () => {
+    dispatch(closeThemePopup());
+  };
+
+  const handleThemeChange = (themeId) => {
+    dispatch(setSelectedTheme(themeId));
+  };
+
+  const handleSubThemeChange = (subThemeId) => {
+    dispatch(setSelectedSubTheme(subThemeId));
+  };
+
+  // Image overlay bounds and current image
+  const imageBounds = [
+    [21.6538526169347278, 72.4500108944436363], // Southwest corner
+    [24.599028110435821, 75.2870019434714663], // Northeast corner
+  ];
+
+  const getCurrentImageUrl = () => {
+    const currentTheme = themes.find((theme) => theme.id === selectedTheme);
+
+    if (selectedTheme === "terrain" && selectedSubTheme) {
+      const subTheme = currentTheme?.subThemes?.find(
+        (sub) => sub.id === selectedSubTheme
+      );
+      return subTheme?.image ? `/${subTheme.image}` : null;
+    }
+
+    return currentTheme?.image ? `/${currentTheme.image}` : null;
   };
 
   // Load GeoJSON data
@@ -153,6 +199,15 @@ export default function MapComponent() {
           <Popup>Custom Center Point</Popup>
         </Marker>
 
+        {/* Render Theme Image Overlay */}
+        {getCurrentImageUrl() && (
+          <ImageOverlay
+            url={getCurrentImageUrl()}
+            bounds={imageBounds}
+            opacity={0.7}
+          />
+        )}
+
         {/* Render GeoJSON layers */}
         {layers.map((layer) => {
           if (layer.visible && geoJsonData[layer.id]) {
@@ -188,6 +243,17 @@ export default function MapComponent() {
           layers={layers}
           onClose={handleCloseLayersPopup}
           onToggleLayer={handleToggleLayer}
+        />
+      )}
+
+      {showThemePopup && (
+        <ThemePopup
+          themes={themes}
+          selectedTheme={selectedTheme}
+          selectedSubTheme={selectedSubTheme}
+          onClose={handleCloseThemePopup}
+          onThemeChange={handleThemeChange}
+          onSubThemeChange={handleSubThemeChange}
         />
       )}
     </div>

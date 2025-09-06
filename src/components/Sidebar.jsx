@@ -2,12 +2,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { TreePine, Layers, Waves, MapPin } from "lucide-react";
 import { toggleMapPopup, closeMapPopup } from "../store/mapSlice";
 import { toggleLayersPopup, closeLayersPopup } from "../store/layersSlice";
+import { toggleThemePopup, closeThemePopup } from "../store/themeSlice";
 
 export default function Sidebar() {
   const dispatch = useDispatch();
   const active = useSelector((state) => {
     if (state.map.showMapPopup) return "Map";
     if (state.layers.showLayersPopup) return "Layers";
+    if (state.theme.showThemePopup) return "Theme";
     return null;
   });
 
@@ -22,12 +24,19 @@ export default function Sidebar() {
     if (id === "Map") {
       dispatch(toggleMapPopup());
       dispatch(closeLayersPopup());
+      dispatch(closeThemePopup());
     } else if (id === "Layers") {
       dispatch(toggleLayersPopup());
       dispatch(closeMapPopup());
+      dispatch(closeThemePopup());
+    } else if (id === "Theme") {
+      dispatch(toggleThemePopup());
+      dispatch(closeMapPopup());
+      dispatch(closeLayersPopup());
     } else {
       dispatch(closeMapPopup());
       dispatch(closeLayersPopup());
+      dispatch(closeThemePopup());
     }
   };
 
