@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  geospatial-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: geospatial-dashboard
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    volumes:
+      - ./public:/usr/share/nginx/html/public
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
