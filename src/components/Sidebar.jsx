@@ -8,7 +8,9 @@ import {
   closeWaterShadeBasinPopup,
 } from "../store/waterShadeBasinSlice";
 
-export default function Sidebar() {
+import { X } from "lucide-react";
+
+export default function Sidebar({ isMobile = false, onClose }) {
   const dispatch = useDispatch();
   const active = useSelector((state) => {
     if (state.map.showMapPopup) return "Map";
@@ -52,8 +54,61 @@ export default function Sidebar() {
       dispatch(closeThemePopup());
       dispatch(closeWaterShadeBasinPopup());
     }
+
+    // Close mobile menu after selection
+    if (isMobile && onClose) {
+      onClose();
+    }
   };
 
+  if (isMobile) {
+    return (
+      <div className="h-full bg-white flex flex-col">
+        {/* Mobile Header with logos and close */}
+        <div className="flex items-center justify-between p-4 bg-[#8F6E56]">
+          <div className="flex items-center gap-4">
+            <img src="/tgis-logo.png" alt="TGIS Logo" className="h-8 w-auto" />
+            <img
+              src="/indasu-logo.png"
+              alt="Indasu Logo"
+              className="h-8 w-auto"
+            />
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 text-white hover:bg-[#a17e65] rounded-lg transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Menu Title */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Menu</span>
+          </div>
+        </div>
+
+        {/* Mobile Menu Items */}
+        <div className="flex-1 p-4">
+          <div className="space-y-2">
+            {buttons?.map((btn) => (
+              <button
+                key={btn.id}
+                onClick={() => handleClick(btn.id)}
+                className="flex items-center gap-4 w-full p-4 text-left hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                {btn.icon}
+                <span className="text-base text-gray-700">{btn.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Sidebar
   return (
     <div className="flex flex-col items-center bg-[#8B6B55] text-white h-screen w-20 p-4 gap-6 rounded-xl">
       {buttons?.map((btn) => (
