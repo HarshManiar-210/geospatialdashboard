@@ -22,7 +22,7 @@ export default function ZoomControl() {
   const zoomOut = () => map.setZoom(map.getZoom() - 1);
 
   return (
-    <div className="absolute top-4 right-4 flex flex-col items-center bg-[#8B6B55] text-white rounded-2xl shadow-lg z-[1000]">
+    <div className="absolute top-4 right-4 flex flex-col items-center bg-[#8B6B55] text-white rounded-2xl shadow-lg z-[10000]">
       <button
         onClick={zoomIn}
         className="px-3 py-2 text-xl font-bold cursor-pointer"

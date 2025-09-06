@@ -1,18 +1,30 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { ChevronDown, ChevronUp, Info } from "lucide-react";
+import { toggleStatisticsPopup } from "../store/waterShadeBasinSlice";
 
 export default function Legend() {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const dispatch = useDispatch();
+  const { selectedBasins } = useSelector((state) => state.waterShadeBasin);
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const handleViewStatistics = () => {
+    dispatch(toggleStatisticsPopup());
+  };
+
   return (
-    <div className="absolute bottom-4 right-4 z-[1000]">
+    <div className="absolute bottom-4 right-4 z-[10000]">
       {/* View Statistics Button */}
       <div className="mb-2">
-        <button className="bg-[#8B6B55] text-white px-4 py-2 rounded-lg shadow-lg hover:bg-[#a17e65] transition-colors font-medium">
+        <button
+          onClick={handleViewStatistics}
+          disabled={selectedBasins.length === 0}
+          className="bg-[#8B6B55] text-white px-4 py-2 rounded-lg shadow-lg hover:bg-[#a17e65] transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
           View Statistics
         </button>
       </div>

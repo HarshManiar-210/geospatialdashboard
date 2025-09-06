@@ -26,7 +26,7 @@ export default function ThemePopup({
   };
 
   return (
-    <div className="absolute top-4 left-4 bg-white shadow-lg rounded-xl p-4 w-64 z-[1000]">
+    <div className="absolute top-4 left-4 bg-white shadow-lg rounded-xl p-4 w-64 z-[10000]">
       <div className="flex justify-between items-center mb-2">
         <h2 className="font-bold text-lg text-[#8B6B55]">Select Theme</h2>
         <button onClick={onClose}>
@@ -120,6 +120,8 @@ export default function ThemePopup({
           ))}
         </div>
       )}
+
+      {/* River Orders moved to Water Shade Basin popup */}
     </div>
   );
 }

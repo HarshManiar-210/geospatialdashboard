@@ -9,7 +9,7 @@ export default function MapLayerPopup({ activeLayer, onClose, onChange }) {
   ];
 
   return (
-    <div className="absolute top-4 left-4 bg-white shadow-lg rounded-xl p-4 w-64 z-[1000]">
+    <div className="absolute top-4 left-4 bg-white shadow-lg rounded-xl p-4 w-64 z-[10000]">
       <div className="flex justify-between items-center mb-2">
         <h2 className="font-bold text-lg text-[#8B6B55]">Map</h2>
         <button onClick={onClose}>

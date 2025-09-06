@@ -4,6 +4,7 @@ import mapReducer from "./mapSlice";
 import layersReducer from "./layersSlice";
 import themeReducer from "./themeSlice";
 import waterShadeBasinReducer from "./waterShadeBasinSlice";
+import riverReducer from "./riverSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,5 +12,6 @@ export const store = configureStore({
     layers: layersReducer,
     theme: themeReducer,
     waterShadeBasin: waterShadeBasinReducer,
+    river: riverReducer,
   },
 });

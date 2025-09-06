@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   showWaterShadeBasinPopup: false,
+  showStatisticsPopup: false,
   selectedBasins: [
     "MA1",
     "MA2",
@@ -90,6 +91,12 @@ const waterShadeBasinSlice = createSlice({
     closeWaterShadeBasinPopup: (state) => {
       state.showWaterShadeBasinPopup = false;
     },
+    toggleStatisticsPopup: (state) => {
+      state.showStatisticsPopup = !state.showStatisticsPopup;
+    },
+    closeStatisticsPopup: (state) => {
+      state.showStatisticsPopup = false;
+    },
     toggleBasinVisibility: (state, action) => {
       const basinId = action.payload;
       const basin = state.basins.find((basin) => basin.id === basinId);
@@ -130,6 +137,8 @@ const waterShadeBasinSlice = createSlice({
 export const {
   toggleWaterShadeBasinPopup,
   closeWaterShadeBasinPopup,
+  toggleStatisticsPopup,
+  closeStatisticsPopup,
   toggleBasinVisibility,
   setBasinVisibility,
 } = waterShadeBasinSlice.actions;
