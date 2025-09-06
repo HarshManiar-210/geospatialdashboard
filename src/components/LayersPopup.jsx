@@ -2,12 +2,12 @@ import { X } from "lucide-react";
 
 export default function LayersPopup({ layers, onClose, onToggleLayer }) {
   return (
-    <div className="absolute top-4 left-4 bg-white shadow-lg rounded-xl p-4 w-64 z-[10000]">
+    <div className="absolute top-4 left-2 right-2 sm:left-4 sm:right-auto sm:w-64 bg-white shadow-lg rounded-xl p-4 z-[10000]">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="font-bold text-lg text-[#8B6B55]">Layers</h2>
+        <h2 className="font-bold text-base sm:text-lg text-[#8B6B55]">Layers</h2>
         <button onClick={onClose}>
           <X
-            size={20}
+            size={18}
             className="text-gray-600 hover:text-black cursor-pointer"
           />
         </button>
