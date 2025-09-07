@@ -131,36 +131,36 @@ export default function StatisticsPopup({ selectedBasins, onClose }) {
   return (
     <div
       ref={containerRef}
-      className="absolute bottom-32 right-4 z-[10000] w-96 bg-white bg-opacity-80 rounded-xl shadow-lg"
+      className="absolute bottom-4 right-2 left-2 sm:bottom-32 sm:right-4 sm:left-auto sm:w-96 z-[10000] bg-white bg-opacity-90 rounded-xl shadow-lg"
     >
       {/* Header */}
-      <div className="flex justify-between items-center p-4 border-b border-gray-200">
-        <div>
-          <h2 className="font-bold text-lg text-[#8B6B55]">Statistics</h2>
-          <span className="text-sm font-semibold text-gray-700">
+      <div className="flex justify-between items-center p-3 sm:p-4 border-b border-gray-200">
+        <div className="flex-1 min-w-0">
+          <h2 className="font-bold text-base sm:text-lg text-[#8B6B55]">Statistics</h2>
+          <span className="text-xs sm:text-sm font-semibold text-gray-700 truncate">
             {currentBasin.replace("MA", "MA - ")}
           </span>
         </div>
         <button
           onClick={onClose}
-          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+          className="p-1 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0 ml-2"
         >
-          <X size={20} className="text-gray-600" />
+          <X size={18} className="text-gray-600 sm:w-5 sm:h-5" />
         </button>
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <div className="flex gap-4">
-          {/* Pie Chart - Left Side */}
-          <div className="flex-shrink-0">
-            <div className="w-36 h-36">
+      <div className="p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          {/* Pie Chart - Top on mobile, Left on desktop */}
+          <div className="flex-shrink-0 flex justify-center sm:justify-start">
+            <div className="w-28 h-28 sm:w-36 sm:h-36">
               <Pie data={chartConfig} options={chartOptions} />
             </div>
           </div>
 
-          {/* Legend - Right Side */}
-          <div className="flex-1 space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+          {/* Legend - Bottom on mobile, Right on desktop */}
+          <div className="flex-1 space-y-1 max-h-32 sm:max-h-48 overflow-y-auto custom-scrollbar">
             {currentChartData.labels.map((label, index) => {
               const landUseInfo = getLandUseInfo(label);
               const value = currentChartData.data[index];
@@ -184,18 +184,18 @@ export default function StatisticsPopup({ selectedBasins, onClose }) {
 
         {/* Basin Selection - Bottom */}
         {sortedBasins.length > 1 && (
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+              <span className="text-sm font-medium text-gray-700 text-center sm:text-left">
                 Select Basin:
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 justify-center sm:justify-end">
                 <button
                   onClick={() =>
                     setCurrentBasinIndex(Math.max(0, currentBasinIndex - 1))
                   }
                   disabled={currentBasinIndex === 0}
-                  className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 rounded-md transition-colors"
+                  className="px-2 sm:px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 rounded-md transition-colors"
                 >
                   ← Prev
                 </button>
@@ -204,7 +204,7 @@ export default function StatisticsPopup({ selectedBasins, onClose }) {
                   onChange={(e) =>
                     setCurrentBasinIndex(parseInt(e.target.value))
                   }
-                  className="px-3 py-1 text-xs border border-gray-300 rounded-md bg-white bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-[#8B6B55] focus:border-transparent"
+                  className="px-2 sm:px-3 py-1 text-xs border border-gray-300 rounded-md bg-white bg-opacity-20 focus:outline-none focus:ring-2 focus:ring-[#8B6B55] focus:border-transparent min-w-0 flex-1 sm:flex-none"
                 >
                   {sortedBasins.map((basin, index) => (
                     <option key={basin} value={index}>
@@ -219,7 +219,7 @@ export default function StatisticsPopup({ selectedBasins, onClose }) {
                     )
                   }
                   disabled={currentBasinIndex === sortedBasins.length - 1}
-                  className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 rounded-md transition-colors"
+                  className="px-2 sm:px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 rounded-md transition-colors"
                 >
                   Next →
                 </button>

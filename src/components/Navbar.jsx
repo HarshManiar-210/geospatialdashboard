@@ -9,13 +9,13 @@ export default function Navbar({ isMobileMenuOpen, onMobileMenuToggle }) {
           <img
             src="/tgis-logo.png"
             alt="TGIS Logo"
-            className="h-12 w-auto lg:h-16"
+            className="h-10 w-auto lg:h-16"
           />
         </div>
 
         {/* Center - Title */}
         <div className="flex-1 text-center">
-          <h1 className="text-lg lg:text-2xl font-bold text-white font-['Inter']">
+          <h1 className="text-sm lg:text-2xl font-bold text-white font-['Inter']">
             HYDROTERRAIN MAP
           </h1>
         </div>
@@ -27,7 +27,7 @@ export default function Navbar({ isMobileMenuOpen, onMobileMenuToggle }) {
             onClick={onMobileMenuToggle}
             className="lg:hidden text-white p-2 hover:bg-[#a17e65] rounded-lg transition-colors"
           >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
           {/* Desktop Indasu Logo */}
