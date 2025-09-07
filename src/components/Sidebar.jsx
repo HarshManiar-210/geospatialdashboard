@@ -67,11 +67,11 @@ export default function Sidebar({ isMobile = false, onClose }) {
         {/* Mobile Header with logos and close */}
         <div className="flex items-center justify-between p-4 bg-[#8F6E56]">
           <div className="flex items-center gap-4">
-            <img src="/tgis-logo.png" alt="TGIS Logo" className="h-8 w-auto" />
+            <img src="/tgis-logo.png" alt="TGIS Logo" className="h-6 w-auto" />
             <img
               src="/indasu-logo.png"
               alt="Indasu Logo"
-              className="h-8 w-auto"
+              className="h-10 w-auto"
             />
           </div>
           <button
