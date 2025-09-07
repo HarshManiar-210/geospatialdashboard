@@ -110,7 +110,7 @@ export default function Sidebar({ isMobile = false, onClose }) {
 
   // Desktop Sidebar
   return (
-    <div className="flex flex-col items-center bg-[#8B6B55] text-white h-screen w-20 p-4 gap-6 rounded-xl">
+    <div className="flex flex-col items-center bg-[#8B6B55] text-white h-full w-20 p-4 gap-6 rounded-xl">
       {buttons?.map((btn) => (
         <button
           key={btn.id}

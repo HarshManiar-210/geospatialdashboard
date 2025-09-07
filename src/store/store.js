@@ -14,4 +14,15 @@ export const store = configureStore({
     waterShadeBasin: waterShadeBasinReducer,
     river: riverReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: ["river/setRiverData"],
+        // Ignore these field paths in all actions
+        ignoredActionPaths: ["payload.data"],
+        // Ignore these paths in the state
+        ignoredPaths: ["river.riverData"],
+      },
+    }),
 });

@@ -36,7 +36,7 @@ import {
   setLoading,
 } from "../store/riverSlice";
 import { getRiverStyle, filterRiversByBasin } from "../utils/riverUtils";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback, memo } from "react";
 import proj4 from "proj4";
 import { fromArrayBuffer } from "geotiff";
 
@@ -59,11 +59,6 @@ proj4.defs("EPSG:4326", "+proj=longlat +datum=WGS84 +no_defs");
 const transformUTMToWGS84 = (geoJson) => {
   if (!geoJson || !geoJson.features) return geoJson;
 
-  console.log("🔄 Transforming GeoJSON:", geoJson.name || "Unknown", {
-    featureCount: geoJson.features?.length || 0,
-    firstFeature: geoJson.features?.[0]?.geometry?.type || "Unknown",
-  });
-
   const transformedFeatures = geoJson.features.map((feature, featureIndex) => {
     if (feature.geometry && feature.geometry.type === "MultiPolygon") {
       const transformedCoordinates = feature.geometry.coordinates.map(
@@ -76,11 +71,6 @@ const transformUTMToWGS84 = (geoJson) => {
                 const [lng, lat] = proj4("EPSG:32643", "EPSG:4326", [x, y]);
                 return [lng, lat];
               } catch (error) {
-                console.error("MultiPolygon transformation error:", error, {
-                  x,
-                  y,
-                  coord,
-                });
                 return [x, y]; // Return original if transformation fails
               }
             })
@@ -106,11 +96,6 @@ const transformUTMToWGS84 = (geoJson) => {
               const [lng, lat] = proj4("EPSG:32643", "EPSG:4326", [x, y]);
               return [lng, lat];
             } catch (error) {
-              console.error("MultiLineString transformation error:", error, {
-                x,
-                y,
-                coord,
-              });
               return [x, y]; // Return original if transformation fails
             }
           })
@@ -134,16 +119,10 @@ const transformUTMToWGS84 = (geoJson) => {
           },
         };
       } catch (error) {
-        console.error("Point transformation error:", error, { x, y });
         return feature; // Return original if transformation fails
       }
     }
     return feature;
-  });
-
-  console.log("✅ Transformation complete:", {
-    originalFeatures: geoJson.features.length,
-    transformedFeatures: transformedFeatures.length,
   });
 
   return {
@@ -176,7 +155,7 @@ const tileUrls = {
   hybrid: "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
 };
 
-export default function MapComponent() {
+const MapComponent = memo(function MapComponent() {
   const center = [23.2803, 74.2684];
   const dispatch = useDispatch();
   const { showMapPopup, activeLayer } = useSelector((state) => state.map);
@@ -247,218 +226,116 @@ export default function MapComponent() {
   };
 
   // Handle map click for GeoTIFF data fetching
-  const handleMapClick = async (event) => {
-    console.log("🖱️ Map clicked!", {
-      event,
-      selectedTheme,
-      selectedSubTheme,
-      latlng: event.latlng,
-    });
-
-    // If landuse is active, don't do anything
-    if (selectedTheme === "landuse") {
-      console.log("🚫 Landuse theme active - ignoring click");
-      return;
-    }
-
-    // If hydrology is active, don't do anything
-    if (selectedTheme === "hydrology") {
-      console.log("🚫 Hydrology theme active - ignoring click");
-      return;
-    }
-
-    // Only proceed for terrain sub-themes (elevation, slope, aspect)
-    if (selectedTheme === "terrain") {
-      console.log("🌄 Terrain theme active - processing click", {
-        selectedSubTheme,
-      });
-      const { lat, lng } = event.latlng;
-
-      // Determine which GeoTIFF file to load based on active sub-theme
-      let tifFileName = "";
-      let layerType = "";
-
-      if (selectedSubTheme === "elevation") {
-        tifFileName = "/MahiElevation.tif";
-        layerType = "Elevation";
-        console.log("📏 Selected Elevation sub-theme");
-      } else if (selectedSubTheme === "slope") {
-        tifFileName = "/MahiSlope.tif";
-        layerType = "Slope";
-        console.log("📐 Selected Slope sub-theme");
-      } else if (selectedSubTheme === "aspect") {
-        tifFileName = "/MahiAspect.tif";
-        layerType = "Aspect";
-        console.log("🧭 Selected Aspect sub-theme");
-      } else {
-        console.log("❌ No valid sub-theme selected:", selectedSubTheme);
-        return; // No valid sub-theme selected
+  const handleMapClick = useCallback(
+    async (event) => {
+      // If landuse is active, don't do anything
+      if (selectedTheme === "landuse") {
+        return;
       }
 
-      console.log("🎯 Processing GeoTIFF:", {
-        tifFileName,
-        layerType,
-        coordinates: { lat, lng },
-      });
+      // If hydrology is active, don't do anything
+      if (selectedTheme === "hydrology") {
+        return;
+      }
 
-      try {
-        console.log("⏳ Starting GeoTIFF processing...");
+      // Only proceed for terrain sub-themes (elevation, slope, aspect)
+      if (selectedTheme === "terrain") {
+        const { lat, lng } = event.latlng;
 
-        // Show global loader
-        dispatch(
-          setLoading({
-            isLoading: true,
-            message: `Loading ${layerType} data...`,
-          })
-        );
+        // Determine which GeoTIFF file to load based on active sub-theme
+        let tifFileName = "";
+        let layerType = "";
 
-        console.log("📥 Fetching GeoTIFF file:", tifFileName);
-        // Fetch GeoTIFF file
-        const response = await fetch(tifFileName);
-        console.log("📦 Response received:", {
-          status: response.status,
-          ok: response.ok,
-          size: response.headers.get("content-length"),
-        });
-
-        const arrayBuffer = await response.arrayBuffer();
-        console.log("📊 ArrayBuffer size:", arrayBuffer.byteLength);
-
-        const tiff = await fromArrayBuffer(arrayBuffer);
-        console.log("🗂️ TIFF loaded successfully");
-
-        const image = await tiff.getImage();
-        console.log("🖼️ Image loaded:", {
-          width: image.getWidth(),
-          height: image.getHeight(),
-          bbox: image.getBoundingBox(),
-        });
-
-        const rasters = await image.readRasters();
-        console.log("📈 Rasters loaded:", {
-          count: rasters.length,
-          firstRasterType: rasters[0]?.constructor?.name,
-        });
-
-        const bbox = image.getBoundingBox();
-        console.log("🗺️ Bounding box:", bbox);
-
-        const width = image.getWidth();
-        const height = image.getHeight();
-
-        console.log("📐 Image dimensions:", { width, height });
-
-        // Convert lat/lng to pixel coordinates
-        const x = ((lng - bbox[0]) / (bbox[2] - bbox[0])) * width;
-        const y = ((bbox[3] - lat) / (bbox[3] - bbox[1])) * height;
-
-        console.log("🎯 Pixel calculation:", {
-          lat,
-          lng,
-          bbox,
-          calculatedX: x,
-          calculatedY: y,
-          floorX: Math.floor(x),
-          floorY: Math.floor(y),
-        });
-
-        const pixelIndex = Math.floor(y) * width + Math.floor(x);
-        console.log("📍 Pixel index:", {
-          pixelIndex,
-          maxIndex: width * height - 1,
-          isValid: pixelIndex >= 0 && pixelIndex < width * height,
-        });
-
-        let pixelValue = undefined;
-        const raster0 = rasters[0];
-
-        console.log("🔍 Extracting pixel value:", {
-          rasterLength: raster0?.length,
-          pixelIndex,
-          rasterType: raster0?.constructor?.name,
-        });
-
-        if (Array.isArray(raster0)) {
-          pixelValue = raster0[pixelIndex];
-          console.log("📊 Array pixel value:", pixelValue);
-        } else if (
-          raster0 instanceof Float32Array ||
-          raster0 instanceof Float64Array ||
-          raster0 instanceof Int32Array ||
-          raster0 instanceof Uint32Array ||
-          raster0 instanceof Int16Array ||
-          raster0 instanceof Uint16Array ||
-          raster0 instanceof Int8Array ||
-          raster0 instanceof Uint8Array
-        ) {
-          pixelValue = raster0[pixelIndex];
-          console.log("📊 TypedArray pixel value:", pixelValue);
+        if (selectedSubTheme === "elevation") {
+          tifFileName = "/MahiElevation.tif";
+          layerType = "Elevation";
+        } else if (selectedSubTheme === "slope") {
+          tifFileName = "/MahiSlope.tif";
+          layerType = "Slope";
+        } else if (selectedSubTheme === "aspect") {
+          tifFileName = "/MahiAspect.tif";
+          layerType = "Aspect";
         } else {
-          console.log("❌ Unknown raster type:", raster0?.constructor?.name);
+          return; // No valid sub-theme selected
         }
 
-        // Update popup content
-        const value = pixelValue !== undefined ? pixelValue.toFixed(2) : "N/A";
-        const unit = layerType === "Elevation" ? " meters" : "";
-        const popupText = `${layerType}: ${value}${unit}`;
+        try {
+          // Show global loader
+          dispatch(
+            setLoading({
+              isLoading: true,
+              message: `Loading ${layerType} data...`,
+            })
+          );
 
-        console.log("✅ Success! Creating popup:", {
-          pixelValue,
-          value,
-          unit,
-          popupText,
-          coordinates: { lat, lng },
-        });
+          // Fetch GeoTIFF file
+          const response = await fetch(tifFileName);
+          const arrayBuffer = await response.arrayBuffer();
+          const tiff = await fromArrayBuffer(arrayBuffer);
+          const image = await tiff.getImage();
+          const rasters = await image.readRasters();
+          const bbox = image.getBoundingBox();
+          const width = image.getWidth();
+          const height = image.getHeight();
 
-        setPopupContent(popupText);
+          // Convert lat/lng to pixel coordinates
+          const x = ((lng - bbox[0]) / (bbox[2] - bbox[0])) * width;
+          const y = ((bbox[3] - lat) / (bbox[3] - bbox[1])) * height;
 
-        // Set clicked marker position
-        setClickedMarker({ lat, lng });
-        console.log("📍 Marker set at:", { lat, lng });
+          const pixelIndex = Math.floor(y) * width + Math.floor(x);
+          let pixelValue = undefined;
+          const raster0 = rasters[0];
 
-        // Auto-open popup after a short delay
-        setTimeout(() => {
-          console.log("🔓 Attempting to open popup...");
-          if (popupRef.current) {
-            popupRef.current.openPopup();
-            console.log("✅ Popup opened successfully");
-          } else {
-            console.log("❌ Popup ref not available");
+          if (Array.isArray(raster0)) {
+            pixelValue = raster0[pixelIndex];
+          } else if (
+            raster0 instanceof Float32Array ||
+            raster0 instanceof Float64Array ||
+            raster0 instanceof Int32Array ||
+            raster0 instanceof Uint32Array ||
+            raster0 instanceof Int16Array ||
+            raster0 instanceof Uint16Array ||
+            raster0 instanceof Int8Array ||
+            raster0 instanceof Uint8Array
+          ) {
+            pixelValue = raster0[pixelIndex];
           }
-        }, 100);
-      } catch (error) {
-        console.error(`❌ Error loading ${tifFileName}:`, error);
-        console.error("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          name: error.name,
-        });
 
-        setPopupContent(`Error loading ${layerType} data`);
-        setClickedMarker({ lat, lng });
+          // Update popup content
+          const value =
+            pixelValue !== undefined ? pixelValue.toFixed(2) : "N/A";
+          const unit = layerType === "Elevation" ? " meters" : "";
+          const popupText = `${layerType}: ${value}${unit}`;
 
-        // Auto-open popup for error case too
-        setTimeout(() => {
-          console.log("🔓 Attempting to open error popup...");
-          if (popupRef.current) {
-            popupRef.current.openPopup();
-            console.log("✅ Error popup opened successfully");
-          } else {
-            console.log("❌ Error popup ref not available");
-          }
-        }, 100);
-      } finally {
-        console.log("🏁 GeoTIFF processing complete - hiding loader");
-        // Hide global loader
-        dispatch(setLoading({ isLoading: false, message: "" }));
+          setPopupContent(popupText);
+
+          // Set clicked marker position
+          setClickedMarker({ lat, lng });
+
+          // Auto-open popup after a short delay
+          setTimeout(() => {
+            if (popupRef.current) {
+              popupRef.current.openPopup();
+            }
+          }, 100);
+        } catch (error) {
+          setPopupContent(`Error loading ${layerType} data`);
+          setClickedMarker({ lat, lng });
+
+          // Auto-open popup for error case too
+          setTimeout(() => {
+            if (popupRef.current) {
+              popupRef.current.openPopup();
+            }
+          }, 100);
+        } finally {
+          // Hide global loader
+          dispatch(setLoading({ isLoading: false, message: "" }));
+        }
       }
-    } else {
-      console.log("❌ Not terrain theme - ignoring click", {
-        selectedTheme,
-        selectedSubTheme,
-      });
-    }
-  };
+    },
+    [selectedTheme, selectedSubTheme, dispatch]
+  );
 
   // Image overlay bounds and current image
   const imageOffset = 0.03; // Offset to shift image to the right
@@ -468,7 +345,7 @@ export default function MapComponent() {
     [24.599028110435821 + topOffset, 75.2870019434714663 + imageOffset], // Northeast corner
   ];
 
-  const getCurrentImageUrl = () => {
+  const getCurrentImageUrl = useMemo(() => {
     const currentTheme = themes.find((theme) => theme.id === selectedTheme);
 
     if (selectedTheme === "terrain" && selectedSubTheme) {
@@ -479,7 +356,7 @@ export default function MapComponent() {
     }
 
     return currentTheme?.image ? `/${currentTheme.image}` : null;
-  };
+  }, [themes, selectedTheme, selectedSubTheme]);
 
   // Load GeoJSON data
   useEffect(() => {
@@ -501,7 +378,7 @@ export default function MapComponent() {
             centroids[layer.id] = centroidsJson;
           }
         } catch (error) {
-          console.error(`Error loading ${layer.file}:`, error);
+          // Handle error silently or log to error service
         }
       }
 
@@ -524,7 +401,7 @@ export default function MapComponent() {
           const transformedGeoJson = transformUTMToWGS84(geoJson);
           data[basin.id] = transformedGeoJson;
         } catch (error) {
-          console.error(`Error loading ${basin.file}:`, error);
+          // Handle error silently or log to error service
         }
       }
 
@@ -538,7 +415,7 @@ export default function MapComponent() {
 
         setWaterBasinCentroidsData(transformedCentroids);
       } catch (error) {
-        console.error(`Error loading ${centroidsFile}:`, error);
+        // Handle error silently or log to error service
       }
 
       setWaterBasinData(data);
@@ -554,29 +431,13 @@ export default function MapComponent() {
   // Load River Order data
   useEffect(() => {
     const loadRiverOrderData = async () => {
-      console.log("🌊 Loading river order data...");
       const hydrologyTheme = themes.find((theme) => theme.id === "hydrology");
-      console.log("🎯 Hydrology theme found:", !!hydrologyTheme);
 
       if (hydrologyTheme?.subThemes) {
-        console.log(
-          "📋 River orders to load:",
-          hydrologyTheme.subThemes.map((r) => r.id)
-        );
-
         for (const riverOrder of hydrologyTheme.subThemes) {
           try {
-            console.log(
-              `📥 Loading ${riverOrder.file} for order ${riverOrder.id}...`
-            );
             const response = await fetch(`/${riverOrder.file}`);
             const geoJson = await response.json();
-            console.log(`✅ Loaded ${riverOrder.file}:`, {
-              type: geoJson.type,
-              featureCount: geoJson.features?.length || 0,
-              firstFeatureType:
-                geoJson.features?.[0]?.geometry?.type || "Unknown",
-            });
 
             // Transform UTM coordinates to WGS84
             const transformedGeoJson = transformUTMToWGS84(geoJson);
@@ -585,9 +446,8 @@ export default function MapComponent() {
             dispatch(
               setRiverData({ orderId: riverOrder.id, data: transformedGeoJson })
             );
-            console.log(`💾 Stored river data for ${riverOrder.id}`);
           } catch (error) {
-            console.error(`❌ Error loading ${riverOrder.file}:`, error);
+            // Handle error silently or log to error service
           }
         }
       }
@@ -595,17 +455,18 @@ export default function MapComponent() {
     loadRiverOrderData();
   }, [themes, dispatch]);
 
-  // Style function for GeoJSON layers
-  const getLayerStyle = (layerId) => {
+  // Style function for GeoJSON layers - memoized for performance
+  const getLayerStyle = useMemo(() => {
     const styles = {
       district: { color: "#000000", weight: 2, fillOpacity: 0.1 }, // Black for District Boundary
       talukas: { color: "#1f78b4", weight: 1, fillOpacity: 0.1 }, // Blue for Taluka Boundary
-      road: { color: "#878787", weight: 2, fillOpacity: 0 }, // Gray for Road
+      road: { color: "#878787", weight: 2, fillOpacity: 0, dashArray: "5, 5" }, // Gray dotted line for Road
       railways: { color: "#e31a1c", weight: 3, fillOpacity: 0 }, // Red for Railway
       canal: { color: "#2741ea", weight: 2, fillOpacity: 0 }, // Blue for Canal
     };
-    return styles[layerId] || { color: "#000", weight: 1, fillOpacity: 0.1 };
-  };
+    return (layerId) =>
+      styles[layerId] || { color: "#000", weight: 1, fillOpacity: 0.1 };
+  }, []);
 
   // Style function for river orders with different thickness levels
 
@@ -651,23 +512,23 @@ export default function MapComponent() {
     });
   };
 
-  // Map events handler component (combines click and mouse events)
-  const MapEventsHandler = () => {
-    useMapEvents({
-      click: (e) => {
-        console.log("🎯 useMapEvents click event triggered");
-        handleMapClick(e);
-      },
-      mousemove: (e) => {
-        const { lat, lng } = e.latlng;
-        setMouseCoordinates({ lat, lng });
-      },
-      mouseleave: () => {
-        setMouseCoordinates(null);
-      },
-    });
-    return null;
-  };
+  // Map events handler component (combines click and mouse events) - memoized
+  const MapEventsHandler = useMemo(() => {
+    const Component = () => {
+      useMapEvents({
+        click: handleMapClick,
+        mousemove: (e) => {
+          const { lat, lng } = e.latlng;
+          setMouseCoordinates({ lat, lng });
+        },
+        mouseleave: () => {
+          setMouseCoordinates(null);
+        },
+      });
+      return null;
+    };
+    return Component;
+  }, [handleMapClick]);
 
   // Function to render water basin centroids
   const renderWaterBasinCentroids = (centroidsGeoJson, selectedBasins) => {
@@ -702,7 +563,7 @@ export default function MapComponent() {
   };
 
   return (
-    <div className="relative h-screen w-full border rounded-xl">
+    <div className="relative h-full w-full border rounded-xl overflow-hidden">
       <MapContainer
         center={center}
         zoom={8}
@@ -714,14 +575,11 @@ export default function MapComponent() {
           url={tileUrls[activeLayer]}
           attribution="&copy; OpenStreetMap contributors"
         />
-        <Marker position={center}>
-          <Popup>Custom Center Point</Popup>
-        </Marker>
 
         {/* Render Theme Image Overlay */}
-        {getCurrentImageUrl() && (
+        {getCurrentImageUrl && (
           <ImageOverlay
-            url={getCurrentImageUrl()}
+            url={getCurrentImageUrl}
             bounds={imageBounds}
             opacity={0.7}
           />
@@ -735,6 +593,9 @@ export default function MapComponent() {
                 <GeoJSON
                   data={geoJsonData[layer.id]}
                   style={() => getLayerStyle(layer.id)}
+                  pathOptions={{
+                    className: layer.id === "road" ? "road-animated" : "",
+                  }}
                 />
                 {/* Render centroids if available */}
                 {layer.centroidsFile &&
@@ -754,7 +615,7 @@ export default function MapComponent() {
                 key={basin.id}
                 data={waterBasinData[basin.id]}
                 style={() => ({
-                  color: "#7ac602", // Green for Vegetation Patches (MA-basins)
+                  color: "#8B6B55",
                   weight: 2,
                   fillOpacity: 0.2,
                 })}
@@ -774,37 +635,16 @@ export default function MapComponent() {
         {/* Render River Orders - Only when Hydrology theme is selected AND river orders are selected */}
         {selectedTheme === "hydrology" && riverOrders.length > 0 && (
           <>
-            {console.log("🎨 Rendering rivers:", {
-              selectedTheme,
-              riverOrders,
-              selectedBasins,
-              riverSelectedBasins,
-              riverDataKeys: Object.keys(riverData),
-              hasRiverData: Object.keys(riverData).length > 0,
-            })}
             {riverOrders.map((orderId) => {
-              console.log(`🔍 Checking river order ${orderId}:`, {
-                hasData: !!riverData[orderId],
-                dataFeatures: riverData[orderId]?.features?.length || 0,
-              });
-
               if (riverData[orderId]) {
                 // Filter rivers by selected basins (use waterShadeBasinSlice selectedBasins)
                 const filteredData = filterRiversByBasin(
                   riverData[orderId],
                   selectedBasins // This is from waterShadeBasinSlice
                 );
-                console.log(`🌊 Filtered data for ${orderId}:`, {
-                  originalFeatures: riverData[orderId].features?.length || 0,
-                  filteredFeatures: filteredData.features?.length || 0,
-                  selectedBasins,
-                });
 
                 // Only render if there are features after filtering
                 if (filteredData.features && filteredData.features.length > 0) {
-                  console.log(
-                    `✅ Rendering river order ${orderId} with ${filteredData.features.length} features`
-                  );
                   return (
                     <GeoJSON
                       key={`river-order-${orderId}`}
@@ -817,13 +657,7 @@ export default function MapComponent() {
                       })}
                     />
                   );
-                } else {
-                  console.log(
-                    `❌ No features to render for ${orderId} after filtering`
-                  );
                 }
-              } else {
-                console.log(`❌ No data available for river order ${orderId}`);
               }
               return null;
             })}
@@ -851,7 +685,11 @@ export default function MapComponent() {
       <CoordinateDisplay coordinates={mouseCoordinates} />
 
       {/* Legend and Statistics - Bottom Right */}
-      <Legend />
+      <Legend
+        selectedTheme={selectedTheme}
+        selectedSubTheme={selectedSubTheme}
+        layers={layers}
+      />
 
       {/* Debug display */}
       {/* <div className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded z-[9999] text-xs">
@@ -907,4 +745,6 @@ export default function MapComponent() {
       )}
     </div>
   );
-}
+});
+
+export default MapComponent;

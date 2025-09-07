@@ -32,50 +32,18 @@ export const getRiverStyle = (orderId) => {
 // Function to filter river features by basin
 export const filterRiversByBasin = (geoJsonData, selectedBasins) => {
   if (!geoJsonData || !geoJsonData.features) {
-    console.log("❌ No GeoJSON data or features to filter");
     return geoJsonData;
   }
 
-  console.log("🔍 Filtering rivers by basin:", {
-    totalFeatures: geoJsonData.features.length,
-    selectedBasins,
-    firstFeatureBasin: geoJsonData.features[0]?.properties?.BASIN,
-    sampleBasins: geoJsonData.features
-      .slice(0, 5)
-      .map((f) => f.properties?.BASIN),
-  });
-
-  const filteredFeatures = geoJsonData.features.filter((feature, index) => {
+  const filteredFeatures = geoJsonData.features.filter((feature) => {
     const basin = feature.properties?.BASIN;
     if (!basin) {
-      console.log(
-        `❌ Feature ${index} has no BASIN property:`,
-        feature.properties
-      );
       return false;
     }
 
     // Convert basin number to basin ID (e.g., 1 -> "MA1")
     const basinId = `MA${basin}`;
-    const isSelected = selectedBasins.includes(basinId);
-
-    if (index < 3) {
-      // Log first few features for debugging
-      console.log(`🔍 Feature ${index}:`, {
-        basin,
-        basinId,
-        isSelected,
-        selectedBasins,
-      });
-    }
-
-    return isSelected;
-  });
-
-  console.log("✅ Basin filtering complete:", {
-    originalFeatures: geoJsonData.features.length,
-    filteredFeatures: filteredFeatures.length,
-    selectedBasins,
+    return selectedBasins.includes(basinId);
   });
 
   return {
