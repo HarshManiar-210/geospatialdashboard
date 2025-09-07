@@ -2,7 +2,7 @@ import { Menu, X } from "lucide-react";
 
 export default function Navbar({ isMobileMenuOpen, onMobileMenuToggle }) {
   return (
-    <nav className="w-full bg-[#8F6E56] px-4 py-3 lg:px-6 lg:py-4 relative z-[1000]">
+    <nav className="w-full bg-[#8F6E56] px-4 py-3 lg:px-4 lg:py-2 relative z-[1000]">
       <div className="flex items-center justify-between">
         {/* Left side - TGIS Logo */}
         <div className="flex items-center">
@@ -34,7 +34,7 @@ export default function Navbar({ isMobileMenuOpen, onMobileMenuToggle }) {
           <img
             src="/indasu-logo.png"
             alt="Indasu Logo"
-            className="hidden lg:block h-16 w-auto"
+            className="hidden lg:block h-20 w-auto"
           />
         </div>
       </div>
