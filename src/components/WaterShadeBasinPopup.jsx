@@ -1,14 +1,13 @@
 import { X } from "lucide-react";
-import { useSelector, useDispatch } from "react-redux";
-import { toggleRiverOrder } from "../store/riverSlice";
+import { useSelector } from "react-redux";
 
 export default function WaterShadeBasinPopup({
   basins,
   onClose,
   onToggleBasin,
+  onToggleRiverOrder,
   selectedTheme, // Add selectedTheme prop
 }) {
-  const dispatch = useDispatch();
   const { selectedRiverOrders } = useSelector((state) => state.river);
   const { themes } = useSelector((state) => state.theme);
 
@@ -19,7 +18,9 @@ export default function WaterShadeBasinPopup({
   return (
     <div className="absolute top-4 left-2 right-2 sm:left-4 sm:right-auto sm:w-80 bg-white shadow-lg rounded-xl p-4 z-[10000]">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="font-bold text-base sm:text-lg text-[#8B6B55]">Water Shade Basin</h2>
+        <h2 className="font-bold text-base sm:text-lg text-[#8B6B55]">
+          Water Shade Basin
+        </h2>
         <button onClick={onClose}>
           <X size={18} className="text-gray-600 hover:text-black" />
         </button>
@@ -63,7 +64,7 @@ export default function WaterShadeBasinPopup({
                 <input
                   type="checkbox"
                   checked={selectedRiverOrders.includes(riverOrder.id)}
-                  onChange={() => dispatch(toggleRiverOrder(riverOrder.id))}
+                  onChange={() => onToggleRiverOrder(riverOrder.id)}
                   className="w-4 h-4 text-[#8B6B55] bg-gray-100 border-gray-300 rounded"
                 />
                 <span className="text-sm text-gray-700 font-medium">

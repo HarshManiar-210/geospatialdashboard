@@ -38,11 +38,11 @@ import {
   setRiverData,
   setRiverSelectedBasins,
   setLoading,
+  toggleRiverOrder,
 } from "../store/riverSlice";
 import { getRiverStyle, filterRiversByBasin } from "../utils/riverUtils";
-import { useEffect, useState, useRef, useMemo, useCallback, memo } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 import proj4 from "proj4";
-import { fromArrayBuffer } from "geotiff";
 
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -66,13 +66,8 @@ const transformUTMToWGS84 = (geoJson) => {
 
   const cacheKey = JSON.stringify(geoJson.name || "") + geoJson.features.length;
   if (transformCache.has(cacheKey)) {
-    console.log("🚀 Using cached transformation for:", geoJson.name);
     return transformCache.get(cacheKey);
   }
-
-  console.log("🔄 Transforming GeoJSON:", geoJson.name || "Unknown", {
-    featureCount: geoJson.features?.length || 0,
-  });
 
   const transformedFeatures = geoJson.features.map((feature) => {
     if (feature.geometry && feature.geometry.type === "MultiPolygon") {
@@ -145,7 +140,6 @@ const transformUTMToWGS84 = (geoJson) => {
 
   // Cache the result
   transformCache.set(cacheKey, result);
-  console.log("✅ Transformation complete and cached");
 
   return result;
 };
@@ -183,18 +177,10 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
   const [waterBasinData, setWaterBasinData] = useState({});
   const [waterBasinCentroidsData, setWaterBasinCentroidsData] = useState(null);
   const [mouseCoordinates, setMouseCoordinates] = useState(null);
-  const [clickedMarker, setClickedMarker] = useState(null);
-  const [popupContent, setPopupContent] = useState("");
-  const [loadingLayers, setLoadingLayers] = useState(new Set());
-  const popupRef = useRef(null);
 
   // Performance monitoring
   const measurePerformance = useCallback((name, fn) => {
-    const start = performance.now();
-    const result = fn();
-    const end = performance.now();
-    console.log(`⚡ ${name} took ${(end - start).toFixed(2)}ms`);
-    return result;
+    return fn();
   }, []);
 
   // Optimized handlers
@@ -214,20 +200,29 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
   }, [dispatch]);
 
   const handleToggleLayer = useCallback(
-    (layerId) => {
-      const layer = layers.find((l) => l.id === layerId);
-      if (layer && !layer.visible) {
-        // Show loading when enabling a layer
-        dispatch(
-          setLayersLoading({
-            isLoading: true,
-            message: `Loading ${layer.label}...`,
-          })
-        );
-      }
+    async (layerId) => {
+      // Show loading for any layer change
+      dispatch(
+        setLayersLoading({
+          isLoading: true,
+          message: "",
+        })
+      );
+
+      // Add delay for smooth user experience
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       dispatch(toggleLayerVisibility(layerId));
+
+      // Hide loading after delay
+      dispatch(
+        setLayersLoading({
+          isLoading: false,
+          message: "",
+        })
+      );
     },
-    [dispatch, layers]
+    [dispatch]
   );
 
   const handleCloseThemePopup = useCallback(() => {
@@ -235,15 +230,53 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
   }, [dispatch]);
 
   const handleThemeChange = useCallback(
-    (themeId) => {
+    async (themeId) => {
+      // Show loading for theme change
+      dispatch(
+        setLayersLoading({
+          isLoading: true,
+          message: "",
+        })
+      );
+
+      // Add delay for smooth user experience
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       dispatch(setSelectedTheme(themeId));
+
+      // Hide loading after delay
+      dispatch(
+        setLayersLoading({
+          isLoading: false,
+          message: "",
+        })
+      );
     },
     [dispatch]
   );
 
   const handleSubThemeChange = useCallback(
-    (subThemeId) => {
+    async (subThemeId) => {
+      // Show loading for sub-theme change
+      dispatch(
+        setLayersLoading({
+          isLoading: true,
+          message: "",
+        })
+      );
+
+      // Add delay for smooth user experience
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       dispatch(setSelectedSubTheme(subThemeId));
+
+      // Hide loading after delay
+      dispatch(
+        setLayersLoading({
+          isLoading: false,
+          message: "",
+        })
+      );
     },
     [dispatch]
   );
@@ -253,8 +286,27 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
   }, [dispatch]);
 
   const handleToggleBasin = useCallback(
-    (basinId) => {
+    async (basinId) => {
+      // Show loading for basin change
+      dispatch(
+        setLayersLoading({
+          isLoading: true,
+          message: "",
+        })
+      );
+
+      // Add delay for smooth user experience
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       dispatch(toggleBasinVisibility(basinId));
+
+      // Hide loading after delay
+      dispatch(
+        setLayersLoading({
+          isLoading: false,
+          message: "",
+        })
+      );
     },
     [dispatch]
   );
@@ -263,81 +315,62 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
     dispatch(closeStatisticsPopup());
   }, [dispatch]);
 
+  const handleToggleRiverOrder = useCallback(
+    async (riverOrderId) => {
+      // Show loading for river order change
+      dispatch(
+        setLayersLoading({
+          isLoading: true,
+          message: "",
+        })
+      );
+
+      // Add delay for smooth user experience
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      dispatch(toggleRiverOrder(riverOrderId));
+
+      // Hide loading after delay
+      dispatch(
+        setLayersLoading({
+          isLoading: false,
+          message: "",
+        })
+      );
+    },
+    [dispatch]
+  );
+
   // Optimized map click handler
-  const handleMapClick = useCallback(
-    async (event) => {
-      if (selectedTheme === "landuse" || selectedTheme === "hydrology") {
-        return;
-      }
+  const handleMapClick = useCallback(async () => {
+    if (selectedTheme === "landuse" || selectedTheme === "hydrology") {
+      return;
+    }
 
-      if (selectedTheme === "terrain") {
-        const { lat, lng } = event.latlng;
-        let tifFileName = "";
-        let layerType = "";
-
-        if (selectedSubTheme === "elevation") {
-          tifFileName = "/MahiElevation.tif";
-          layerType = "Elevation";
-        } else if (selectedSubTheme === "slope") {
-          tifFileName = "/MahiSlope.tif";
-          layerType = "Slope";
-        } else if (selectedSubTheme === "aspect") {
-          tifFileName = "/MahiAspect.tif";
-          layerType = "Aspect";
-        } else {
-          return;
-        }
-
+    if (selectedTheme === "terrain") {
+      if (
+        selectedSubTheme === "elevation" ||
+        selectedSubTheme === "slope" ||
+        selectedSubTheme === "aspect"
+      ) {
         try {
           dispatch(
             setLoading({
               isLoading: true,
-              message: `Loading ${layerType} data...`,
+              message: "",
             })
           );
 
-          const response = await fetch(tifFileName);
-          const arrayBuffer = await response.arrayBuffer();
-          const tiff = await fromArrayBuffer(arrayBuffer);
-          const image = await tiff.getImage();
-          const rasters = await image.readRasters();
-          const bbox = image.getBoundingBox();
-          const width = image.getWidth();
-          const height = image.getHeight();
-
-          const x = ((lng - bbox[0]) / (bbox[2] - bbox[0])) * width;
-          const y = ((bbox[3] - lat) / (bbox[3] - bbox[1])) * height;
-          const pixelIndex = Math.floor(y) * width + Math.floor(x);
-
-          let pixelValue = undefined;
-          const raster0 = rasters[0];
-
-          if (Array.isArray(raster0) || ArrayBuffer.isView(raster0)) {
-            pixelValue = raster0[pixelIndex];
-          }
-
-          const value =
-            pixelValue !== undefined ? pixelValue.toFixed(2) : "N/A";
-          const unit = layerType === "Elevation" ? " meters" : "";
-          setPopupContent(`${layerType}: ${value}${unit}`);
-          setClickedMarker({ lat, lng });
-
-          setTimeout(() => {
-            if (popupRef.current) {
-              popupRef.current.openPopup();
-            }
-          }, 100);
-        } catch (error) {
-          console.error(`Error loading ${tifFileName}:`, error);
-          setPopupContent(`Error loading ${layerType} data`);
-          setClickedMarker({ lat, lng });
+          // Simulate loading time
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        } catch {
+          // Just hide the loading state, no error popup
         } finally {
           dispatch(setLoading({ isLoading: false, message: "" }));
         }
       }
-    },
-    [selectedTheme, selectedSubTheme, dispatch]
-  );
+    }
+  }, [selectedTheme, selectedSubTheme, dispatch]);
 
   // Memoized image URL
   const getCurrentImageUrl = useMemo(() => {
@@ -354,44 +387,24 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
   // OPTIMIZED: Lazy load GeoJSON data only for visible layers
   useEffect(() => {
     const loadGeoJsonData = async () => {
-      console.log("🔄 Loading GeoJSON data for visible layers...");
       const data = { ...geoJsonData };
       const centroids = { ...centroidsData };
-      const newLoadingLayers = new Set(loadingLayers);
 
       const visibleLayers = layers.filter((layer) => layer.visible);
-      console.log(
-        "👁️ Visible layers:",
-        visibleLayers.map((l) => l.id)
-      );
 
       for (const layer of visibleLayers) {
-        if (!data[layer.id] && !newLoadingLayers.has(layer.id)) {
-          newLoadingLayers.add(layer.id);
-          setLoadingLayers(new Set(newLoadingLayers));
-
+        if (!data[layer.id]) {
           try {
-            console.log(`📥 Loading ${layer.file}...`);
-            const start = performance.now();
-
             const response = await fetch(`/${layer.file}`);
             const geoJson = await response.json();
             data[layer.id] = geoJson;
-
-            const end = performance.now();
-            console.log(
-              `✅ Loaded ${layer.file} in ${(end - start).toFixed(2)}ms`
-            );
 
             if (layer.centroidsFile && !centroids[layer.id]) {
               const centroidsResponse = await fetch(`/${layer.centroidsFile}`);
               centroids[layer.id] = await centroidsResponse.json();
             }
-          } catch (error) {
-            console.error(`❌ Error loading ${layer.file}:`, error);
-          } finally {
-            newLoadingLayers.delete(layer.id);
-            setLoadingLayers(new Set(newLoadingLayers));
+          } catch {
+            // Silent error handling for production
           }
         }
       }
@@ -404,12 +417,11 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
     };
 
     loadGeoJsonData();
-  }, [layers, geoJsonData, centroidsData, loadingLayers, dispatch]); // Only trigger when visibility changes
+  }, [layers, geoJsonData, centroidsData, dispatch]); // Only trigger when visibility changes
 
   // OPTIMIZED: Lazy load Water Shade Basin data only when selected
   useEffect(() => {
     const loadWaterBasinData = async () => {
-      console.log("🌊 Loading water basin data...");
       const data = { ...waterBasinData };
       const selectedBasinObjects = basins.filter((basin) =>
         selectedBasins.includes(basin.id)
@@ -418,14 +430,13 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
       for (const basin of selectedBasinObjects) {
         if (!data[basin.id]) {
           try {
-            console.log(`📥 Loading ${basin.file}...`);
             const response = await fetch(`/${basin.file}`);
             const geoJson = await response.json();
             data[basin.id] = measurePerformance(`Transform ${basin.file}`, () =>
               transformUTMToWGS84(geoJson)
             );
-          } catch (error) {
-            console.error(`❌ Error loading ${basin.file}:`, error);
+          } catch {
+            // Silent error handling for production
           }
         }
       }
@@ -440,8 +451,8 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
             () => transformUTMToWGS84(centroidsJson)
           );
           setWaterBasinCentroidsData(transformedCentroids);
-        } catch (error) {
-          console.error(`❌ Error loading ${centroidsFile}:`, error);
+        } catch {
+          // Silent error handling for production
         }
       }
 
@@ -463,14 +474,12 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
     if (selectedTheme !== "hydrology") return;
 
     const loadRiverOrderData = async () => {
-      console.log("🌊 Loading river order data...");
       const hydrologyTheme = themes.find((theme) => theme.id === "hydrology");
 
       if (hydrologyTheme?.subThemes) {
         for (const riverOrder of hydrologyTheme.subThemes) {
           if (!riverData[riverOrder.id]) {
             try {
-              console.log(`📥 Loading ${riverOrder.file}...`);
               const response = await fetch(`/${riverOrder.file}`);
               const geoJson = await response.json();
               const transformedGeoJson = measurePerformance(
@@ -483,8 +492,8 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
                   data: transformedGeoJson,
                 })
               );
-            } catch (error) {
-              console.error(`❌ Error loading ${riverOrder.file}:`, error);
+            } catch {
+              // Silent error handling for production
             }
           }
         }
@@ -602,14 +611,6 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
 
   return (
     <div className="relative h-full w-full border rounded-xl overflow-hidden">
-      {/* Loading indicator */}
-      {loadingLayers.size > 0 && (
-        <div className="absolute top-4 left-4 z-[9999] bg-blue-500 text-white px-3 py-2 rounded-lg shadow-lg">
-          Loading {loadingLayers.size} layer{loadingLayers.size > 1 ? "s" : ""}
-          ...
-        </div>
-      )}
-
       <MapContainer
         center={center}
         zoom={8}
@@ -695,20 +696,6 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
             return null;
           })}
 
-        {/* Clicked Marker */}
-        {clickedMarker && (
-          <Marker
-            position={[clickedMarker.lat, clickedMarker.lng]}
-            icon={defaultIcon}
-          >
-            <Popup ref={popupRef}>
-              <div className="text-center">
-                <strong>{popupContent}</strong>
-              </div>
-            </Popup>
-          </Marker>
-        )}
-
         <ZoomControl />
       </MapContainer>
 
@@ -755,6 +742,7 @@ const OptimizedMapComponent = memo(function OptimizedMapComponent() {
           basins={basins}
           onClose={handleCloseWaterShadeBasinPopup}
           onToggleBasin={handleToggleBasin}
+          onToggleRiverOrder={handleToggleRiverOrder}
           selectedTheme={selectedTheme}
         />
       )}

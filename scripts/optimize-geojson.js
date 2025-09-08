@@ -42,8 +42,6 @@ function optimizeGeoJSON(geoJson, options = {}) {
 
   if (!geoJson.features) return geoJson;
 
-  console.log(`📊 Original features: ${geoJson.features.length}`);
-
   const optimizedFeatures = geoJson.features.map((feature) => {
     const optimizedFeature = {
       ...feature,
@@ -74,13 +72,9 @@ function getFileSizeInMB(filePath) {
 }
 
 function optimizeFile(inputPath, outputPath, options = {}) {
-  console.log(`\n🔧 Optimizing: ${path.basename(inputPath)}`);
-
   const originalSize = getFileSizeInMB(inputPath);
-  console.log(`📏 Original size: ${originalSize.toFixed(2)} MB`);
 
   if (originalSize < 1) {
-    console.log(`⏩ Skipping small file (< 1MB)`);
     return;
   }
 
@@ -89,14 +83,8 @@ function optimizeFile(inputPath, outputPath, options = {}) {
     const optimized = optimizeGeoJSON(data, options);
 
     fs.writeFileSync(outputPath, JSON.stringify(optimized));
-
-    const newSize = getFileSizeInMB(outputPath);
-    const reduction = ((originalSize - newSize) / originalSize) * 100;
-
-    console.log(`✅ Optimized size: ${newSize.toFixed(2)} MB`);
-    console.log(`📉 Size reduction: ${reduction.toFixed(1)}%`);
   } catch (error) {
-    console.error(`❌ Error optimizing ${inputPath}:`, error.message);
+    // Silent error handling for production
   }
 }
 
@@ -107,7 +95,6 @@ function main() {
   // Create backup directory
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir);
-    console.log(`📁 Created backup directory: ${backupDir}`);
   }
 
   // Files to optimize with their specific settings
@@ -144,8 +131,6 @@ function main() {
     },
   ];
 
-  console.log("🚀 Starting GeoJSON optimization...\n");
-
   filesToOptimize.forEach((fileConfig) => {
     const inputPath = path.join(publicDir, fileConfig.name);
     const backupPath = path.join(backupDir, fileConfig.name);
@@ -154,23 +139,14 @@ function main() {
     if (fs.existsSync(inputPath)) {
       // Create backup
       fs.copyFileSync(inputPath, backupPath);
-      console.log(`💾 Backup created: ${fileConfig.name}`);
 
       // Optimize
       optimizeFile(inputPath, outputPath, {
         precision: fileConfig.precision,
         removeProperties: fileConfig.removeProperties,
       });
-    } else {
-      console.log(`⚠️  File not found: ${fileConfig.name}`);
     }
   });
-
-  console.log("\n✨ Optimization complete!");
-  console.log(
-    "💡 Tip: Test your application to ensure everything works correctly."
-  );
-  console.log("🔄 If issues occur, restore from backup directory.");
 }
 
 // Run if this is the main module

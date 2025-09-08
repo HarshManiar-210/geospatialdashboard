@@ -60,8 +60,6 @@ useEffect(() => {
             const centroidsResponse = await fetch(`/${layer.centroidsFile}`);
             centroids[layer.id] = await centroidsResponse.json();
           }
-        } catch (error) {
-          console.error(`Error loading ${layer.file}:`, error);
         }
       }
     }
@@ -172,7 +170,6 @@ const measurePerformance = (name, fn) => {
   const start = performance.now();
   const result = fn();
   const end = performance.now();
-  console.log(`${name} took ${end - start} milliseconds`);
   return result;
 };
 ```
