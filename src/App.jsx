@@ -2,9 +2,10 @@ import { useState, lazy, Suspense } from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import GlobalLoader from "./components/GlobalLoader";
 
 // Lazy load heavy components
-const MapComponent = lazy(() => import("./components/MapComponent"));
+const MapComponent = lazy(() => import("./components/OptimizedMapComponent"));
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -59,6 +60,9 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Global Loader */}
+      <GlobalLoader />
     </>
   );
 }

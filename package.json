@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "optimize": "node scripts/optimize-geojson.js",
+    "build:optimized": "npm run optimize && npm run build"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.0",

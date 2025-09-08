@@ -9,7 +9,7 @@ export default function Navbar({ isMobileMenuOpen, onMobileMenuToggle }) {
           <img
             src="/tgis-logo.png"
             alt="TGIS Logo"
-            className="h-6 w-auto lg:h-8"
+            className="h-8 w-auto lg:h-10"
           />
         </div>
 

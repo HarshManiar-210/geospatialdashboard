@@ -3,6 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   showLayersPopup: false,
+  isLoading: false,
+  loadingMessage: "",
   layers: [
     {
       id: "district",
@@ -53,6 +55,10 @@ const layersSlice = createSlice({
         layer.visible = visible;
       }
     },
+    setLoading: (state, action) => {
+      state.isLoading = action.payload.isLoading;
+      state.loadingMessage = action.payload.message || "";
+    },
   },
 });
 
@@ -61,5 +67,6 @@ export const {
   closeLayersPopup,
   toggleLayerVisibility,
   setLayerVisibility,
+  setLoading,
 } = layersSlice.actions;
 export default layersSlice.reducer;
